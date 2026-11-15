@@ -1,0 +1,44 @@
+module binary_to_gray(
+    input [3:0] B,
+    output [3:0] G
+);
+
+assign G[3] = B[3];
+assign G[2] = B[3] ^ B[2];
+assign G[1] = B[2] ^ B[1];
+assign G[0] = B[1] ^ B[0];
+
+endmodule
+test
+module tb_binary_to_gray;
+
+reg [3:0] B;
+wire [3:0] G;
+
+binary_to_gray uut(B, G);
+
+initial
+begin
+    $monitor("Time=%0t Binary=%b Gray=%b", $time, B, G);
+
+    B = 4'b0000;
+    #10 B = 4'b0001;
+    #10 B = 4'b0010;
+    #10 B = 4'b0011;
+    #10 B = 4'b0100;
+    #10 B = 4'b0101;
+    #10 B = 4'b0110;
+    #10 B = 4'b0111;
+    #10 B = 4'b1000;
+    #10 B = 4'b1001;
+    #10 B = 4'b1010;
+    #10 B = 4'b1011;
+    #10 B = 4'b1100;
+    #10 B = 4'b1101;
+    #10 B = 4'b1110;
+    #10 B = 4'b1111;
+
+    #10 $finish;
+end
+
+endmodule

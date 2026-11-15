@@ -1,0 +1,68 @@
+`timescale 1ns / 1ps
+
+module up_down_counter (
+    input clk,
+    input reset,
+    input mode,
+    output reg [2:0] count
+);
+
+always @(posedge clk)
+begin
+
+    if (reset)
+        count <= 3'b000;
+
+    else if (mode)
+        count <= count + 1'b1;
+
+    else
+        count <= count - 1'b1;
+
+end
+
+endmodule
+asy
+`timescale 1ns / 1ps
+
+module async_up_down_counter(
+    input clk,
+    input reset,
+    input mode,
+    output reg [2:0] count
+);
+
+wire clk1, clk2;
+
+// Select clock edges according to mode
+assign clk1 = mode ? ~count[0] : count[0];
+assign clk2 = mode ? ~count[1] : count[1];
+
+// First Flip-Flop
+always @(posedge clk or posedge reset)
+begin
+    if (reset)
+        count[0] <= 1'b0;
+    else
+        count[0] <= ~count[0];
+end
+
+// Second Flip-Flop
+always @(posedge clk1 or posedge reset)
+begin
+    if (reset)
+        count[1] <= 1'b0;
+    else
+        count[1] <= ~count[1];
+end
+
+// Third Flip-Flop
+always @(posedge clk2 or posedge reset)
+begin
+    if (reset)
+        count[2] <= 1'b0;
+    else
+        count[2] <= ~count[2];
+end
+
+endmodule

@@ -1,0 +1,124 @@
+be
+module mux4_behavioral(
+    input I0, I1, I2, I3,
+    input S0, S1,
+    output reg Y
+);
+
+always @(*)
+begin
+
+    if (S1 == 0 && S0 == 0)
+        Y = I0;
+
+    else if (S1 == 0 && S0 == 1)
+        Y = I1;
+
+    else if (S1 == 1 && S0 == 0)
+        Y = I2;
+
+    else if (S1 == 1 && S0 == 1)
+        Y = I3;
+
+    else
+        Y = 1'b0;
+
+end
+
+endmodule
+data
+module mux4_dataflow(
+    input I0, I1, I2, I3,
+    input S0, S1,
+    output Y
+);
+
+assign Y = (~S1 & ~S0 & I0) |
+           (~S1 &  S0 & I1) |
+           ( S1 & ~S0 & I2) |
+           ( S1 &  S0 & I3);
+
+endmodule
+gate
+module mux4_gatelevel(
+    input I0, I1, I2, I3,
+    input S0, S1,
+    output Y
+);
+
+wire nS0, nS1;
+wire w0, w1, w2, w3;
+
+not G1(nS0, S0);
+not G2(nS1, S1);
+
+and G3(w0, I0, nS1, nS0);
+and G4(w1, I1, nS1, S0);
+and G5(w2, I2, S1, nS0);
+and G6(w3, I3, S1, S0);
+
+or G7(Y, w0, w1, w2, w3);
+
+endmodule
+her
+module mux2(
+    input A, B, S,
+    output Y
+);
+
+assign Y = S ? B : A;
+
+endmodule
+module mux4_hierarchical(
+    input I0, I1, I2, I3,
+    input S0, S1,
+    output Y
+);
+
+wire w0, w1;
+
+mux2 M1(I0, I1, S0, w0);
+
+mux2 M2(I2, I3, S0, w1);
+
+mux2 M3(w0, w1, S1, Y);
+
+endmodule
+test 
+module tb_mux4;
+
+reg I0, I1, I2, I3;
+reg S0, S1;
+
+wire Y;
+
+// DUT (Design Under Test)
+mux4_behavioral DUT(
+    I0, I1, I2, I3, S0, S1, Y
+);
+
+initial
+begin
+
+    $monitor("Time=%0t | S1=%b S0=%b | I0=%b I1=%b I2=%b I3=%b | Y=%b",
+             $time, S1, S0, I0, I1, I2, I3, Y);
+
+    I0 = 0; I1 = 1; I2 = 1; I3 = 0;
+
+    S1 = 0; S0 = 0;
+    #10;
+
+    S1 = 0; S0 = 1;
+    #10;
+
+    S1 = 1; S0 = 0;
+    #10;
+
+    S1 = 1; S0 = 1;
+    #10;
+
+    $finish;
+
+end
+
+endmodule

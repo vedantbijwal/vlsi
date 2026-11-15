@@ -1,0 +1,87 @@
+module HA(
+    input a, b,
+    output sum,
+    output carry
+);
+
+assign sum = a ^ b;
+assign carry = a & b;
+
+endmodule
+module OR_GATE(
+    input a, b,
+    output Cout
+);
+
+assign Cout = a | b;
+
+endmodule
+module FA(
+    input a, b, Cin,
+    output sum,
+    output Cout
+);
+
+wire w1, w2, w3;
+
+// First Half Adder
+HA HA_1(a, b, w1, w2);
+
+// Second Half Adder
+HA HA_2(w1, Cin, sum, w3);
+
+// OR Gate
+OR_GATE OR_1(w2, w3, Cout);
+
+endmodule
+test
+module FA_tb;
+
+reg a, b, Cin;
+wire sum, Cout;
+
+// Instantiate Full Adder
+FA uut(
+    .a(a),
+    .b(b),
+    .Cin(Cin),
+    .sum(sum),
+    .Cout(Cout)
+);
+
+// Apply test inputs
+initial
+begin
+
+    $monitor("Time=%0t | A=%b B=%b Cin=%b | Sum=%b Cout=%b",
+              $time, a, b, Cin, sum, Cout);
+
+    a=0; b=0; Cin=0;
+    #10;
+
+    a=0; b=0; Cin=1;
+    #10;
+
+    a=0; b=1; Cin=0;
+    #10;
+
+    a=0; b=1; Cin=1;
+    #10;
+
+    a=1; b=0; Cin=0;
+    #10;
+
+    a=1; b=0; Cin=1;
+    #10;
+
+    a=1; b=1; Cin=0;
+    #10;
+
+    a=1; b=1; Cin=1;
+    #10;
+
+    $finish;
+
+end
+
+endmodule
